@@ -2,21 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== CITEKS — Atelier Light v2 (brand-respecting, new skeleton) ===== */
+/* ===== CITEKS — Refined, airy variant (smaller type, finer lines) ===== */
 :root{
-  /* 60/30/10 palette */
-  --canvas: #f6f4f0;        /* base */
-  --ink: #0e1322;           /* primary text */
-  --stone: #ffffff;         /* card/surfaces */
-  --hair: #e9e6e0;          /* dividers */
-  --accent: #0a7d5d;        /* forest accent */
-  --accent-900: #075e45;    /* hover */
+  /* 60/30/10 palette (lighter canvas, neutral ink, subtle hairlines, forest accent) */
+  --canvas: #f6f4f0;      /* ~light beige canvas */
+  --ink: #0e1322;         /* primary text */
+  --stone: #ffffff;       /* cards/surfaces */
+  --hair: #e7e3dd;        /* hairline dividers */
+  --accent: #0a7d5d;      /* deep forest accent */
+  --accent-900: #075e45;  /* hover */
 
-  /* Major Third scale */
-  --ts-p: 16px; --ts-h6: 20px; --ts-h5: 25px; --ts-h4: 31.25px;
-  --ts-h3: 39.06px; --ts-h2: 48.83px; --ts-h1: 61.04px;
+  /* Smaller Major Third scale (desktop) */
+  --ts-p: 16px;
+  --ts-h6: 18px;
+  --ts-h5: 20px;
+  --ts-h4: 25px;
+  --ts-h3: 31.25px;
+  --ts-h2: 39.06px;
+  --ts-h1: 48.83px;
 
-  --container: 1280px;
+  --container: 1160px;    /* slightly narrower for more air on large screens */
 }
 
 html, body, #root { height: 100%; }
@@ -29,46 +34,62 @@ body {
 
 /* Type utilities (letter-spacing & leading follow your rules) */
 .ts-p { font-size: var(--ts-p); line-height: 1.5; letter-spacing: 0; }
-.ts-h6{ font-size: var(--ts-h6); line-height:1.3; letter-spacing:-0.005em;}
-.ts-h5{ font-size: var(--ts-h5); line-height:1.3; letter-spacing:-0.01em;}
-.ts-h4{ font-size: var(--ts-h4); line-height:1.3; letter-spacing:-0.012em;}
-.ts-h3{ font-size: var(--ts-h3); line-height:1.2; letter-spacing:-0.015em;}
-.ts-h2{ font-size: var(--ts-h2); line-height:1.1; letter-spacing:-0.018em; font-family:"EB Garamond",serif;}
-.ts-h1{ font-size: var(--ts-h1); line-height:1.0; letter-spacing:-0.02em;  font-family:"EB Garamond",serif;}
+.ts-h6{ font-size: var(--ts-h6); line-height:1.35; letter-spacing:-0.005em;}
+.ts-h5{ font-size: var(--ts-h5); line-height:1.3;  letter-spacing:-0.01em;}
+.ts-h4{ font-size: var(--ts-h4); line-height:1.3;  letter-spacing:-0.012em;}
+.ts-h3{ font-size: var(--ts-h3); line-height:1.24; letter-spacing:-0.015em;}
+.ts-h2{ font-size: var(--ts-h2); line-height:1.12; letter-spacing:-0.018em; font-family:"EB Garamond",serif;}
+.ts-h1{ font-size: var(--ts-h1); line-height:1.02; letter-spacing:-0.02em;  font-family:"EB Garamond",serif;}
 
-.container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+.container { max-width: var(--container); margin: 0 auto; padding: 0 20px; }
 
 /* Cards / Buttons / Lines */
-.surface { background: var(--stone); border:1px solid var(--hair); border-radius: 16px; }
+.surface { background: var(--stone); border:1px solid var(--hair); border-radius: 14px; }
 .hair { border-top: 1px solid var(--hair); }
 .btn { @apply inline-flex items-center gap-2 rounded-full px-5 py-2 ts-h6; }
 .btn-acc { background: var(--accent); color: #ecfff9; }
 .btn-acc:hover{ background: var(--accent-900); }
 
 /* NAV */
-.topbar { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.7); backdrop-filter: blur(10px); border-bottom: 1px solid var(--hair); }
+.topbar { position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,.65); backdrop-filter: blur(8px); border-bottom: 1px solid var(--hair); }
 
 /* HERO */
-.hero { position: relative; min-height: 92vh; overflow: clip; border-bottom: 1px solid var(--hair); }
-.hero-media { position:absolute; inset:0; background-size: cover; background-position: center; filter: saturate(1.06) contrast(1.03); }
-.hero-scrim{ position:absolute; inset:0; background: linear-gradient(180deg, rgba(14,19,34,.38), rgba(14,19,34,.18) 28%, rgba(255,255,255,0) 58%); mix-blend-mode: multiply; }
-.hero-vignette{ position:absolute; inset:-10% -20% -10% -20%; background:
-  radial-gradient(800px 340px at 10% -10%, rgba(10,125,93,.16), transparent 60%),
-  radial-gradient(600px 400px at 110% 20%, rgba(10,125,93,.12), transparent 60%); }
+.hero { position: relative; min-height: 88vh; overflow: clip; border-bottom: 1px solid var(--hair); }
+.hero-media { position:absolute; inset:0; background-size: cover; background-position: center; filter: saturate(1.02) contrast(1.02); }
+.hero-scrim{
+  position:absolute; inset:0;
+  /* Stronger scrim so white text always readable on dark-green photos */
+  background:
+    radial-gradient(600px 320px at 15% 10%, rgba(9,13,22,.45), transparent 60%),
+    linear-gradient(180deg, rgba(9,13,22,.55), rgba(9,13,22,.28) 32%, rgba(9,13,22,.18) 58%, rgba(9,13,22,.05) 82%, rgba(9,13,22,0) 100%);
+  mix-blend-mode: multiply;
+}
+.hero-copy{
+  background: rgba(9,13,22,.36);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 14px;
+  backdrop-filter: blur(6px);
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0,0,0,.4);
+}
 
 /* HORIZONTAL TRACK */
 .snap-row { display: grid; grid-auto-flow: column; grid-auto-columns: 88%; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
 .snap-row > * { scroll-snap-align: center; }
-@media (min-width:1280px){ .snap-row{ grid-auto-columns: 52%; }}
+@media (min-width:1280px){ .snap-row{ grid-auto-columns: 56%; }}
 
-/* PINNED CHAPTERS */
-.pin-wrap { position: relative; height: 260vh; }
+/* PINNED BLOCK */
+.pin-wrap { position: relative; height: 220vh; }
 .pin-stage{ position: sticky; top: 0; display: grid; place-items: center; height: 100vh; }
 
 /* Tablet & Mobile type scale */
 @media (min-width: 481px) and (max-width:1024px){
-  :root{ --ts-h1:48.83px; --ts-h2:39.06px; --ts-h3:31.25px; --ts-h4:25px; --ts-h5:20px; --ts-h6:18px; }
+  :root{
+    --ts-h1:39.06px; --ts-h2:31.25px; --ts-h3:25px; --ts-h4:20px; --ts-h5:18px; --ts-h6:16px;
+  }
 }
 @media (max-width:480px){
-  :root{ --ts-p:16px; --ts-h1:39.06px; --ts-h2:31.25px; --ts-h3:25px; --ts-h4:20px; --ts-h5:16px; --ts-h6:14px; }
+  :root{
+    --ts-p:16px; --ts-h1:31.25px; --ts-h2:25px; --ts-h3:20px; --ts-h4:18px; --ts-h5:16px; --ts-h6:14px;
+  }
 }
