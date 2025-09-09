@@ -1,9 +1,12 @@
+// /.netlify/functions/create-checkout-session
 import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-export async function handler(event){
-  if (event.httpMethod !== "POST") return { statusCode:405, body:"Method Not Allowed" };
-  try{
+export async function handler(event) {
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: "Method Not Allowed" };
+  }
+  try {
     const { slug, rush, origin } = JSON.parse(event.body || "{}");
     const priceMap = {
       starter: rush ? process.env.PRICE_STARTER_RUSH : process.env.PRICE_STARTER_BASE,
@@ -11,14 +14,19 @@ export async function handler(event){
       scale:   rush ? process.env.PRICE_SCALE_RUSH   : process.env.PRICE_SCALE_BASE,
     };
     const price = priceMap[slug];
-    if(!price) return { statusCode:400, body:JSON.stringify({ error:"Invalid package" }) };
+    if (!price) return { statusCode: 400, body: JSON.stringify({ error: "Invalid package" }) };
 
     const session = await stripe.checkout.sessions.create({
-      ui_mode:"embedded", mode:"payment",
-      line_items:[{ price, quantity:1 }],
-      return_url:`${origin || "https://example.com"}/#/thank-you?session_id={CHECKOUT_SESSION_ID}`,
-      metadata:{ package:slug, rush: rush ? "true":"false" },
+      ui_mode: "embedded",
+      mode: "payment",
+      line_items: [{ price, quantity: 1 }],
+      return_url: `${origin || "https://example.com"}/#/thank-you?session_id={CHECKOUT_SESSION_ID}`,
+      metadata: { package: slug, rush: rush ? "true" : "false" },
     });
-    return { statusCode:200, headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ clientSecret: session.client_secret }) };
-  }catch(err){ console.error(err); return { statusCode:500, body: JSON.stringify({ error:"Server Error" }) }; }
+
+    return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ clientSecret: session.client_secret }) };
+  } catch (err) {
+    console.error(err);
+    return { statusCode: 500, body: JSON.stringify({ error: "Server Error" }) };
+  }
 }
