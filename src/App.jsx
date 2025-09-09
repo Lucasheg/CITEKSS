@@ -1,18 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from "framer-motion";
-import { ArrowRight, Mail, Menu, X, Building2, Globe2, Compass, Check } from "lucide-react";
+import { ArrowRight, Mail, Menu, X, Check, Globe2, Building2, Compass } from "lucide-react";
 
 /**
- * CITEKS — Light + Motion pass
- * - Waterfall parallax hero (no scroll-jack; honors reduced motion)
- * - Pinned chapters with text transitions
- * - Horizontal snap showcase with subtle scale
- * - Keeps routes, forms, and Stripe flow intact
+ * CITEKS — New Visual Skeleton (no reuse from previous designs)
+ * - Top nav (sticky, glass) + light canvas
+ * - Hero: photo backdrop (optional) + soft parallax; large editorial headline
+ * - Early proof, service ladder, horizontal showcase, pinned “why us” chapters
+ * - Packages, contact, projects, brief/pay/thank-you, static pages
+ * - Hash routes preserved: /#/, /#/why-us, /#/projects, /#/brief/:slug, /#/pay/:slug, /#/thank-you, /#/privacy, /#/tech-terms
  */
 
-function cx(...c){ return c.filter(Boolean).join(" "); }
+function cx(...c) { return c.filter(Boolean).join(" "); }
 
-/* ---- Showcase Data ---- */
+/* ---------- Data ---------- */
 const showcase = [
   { key:"law", title:"Harbor & Sage Law — Scale", blurb:"Editorial architecture for business law.", src:"/showcase/harbor-sage-law.png" },
   { key:"vigor-hero", title:"Vigor Lab — Growth", blurb:"High-energy hero + programs grid.", src:"/showcase/vigor-lab-hero.png" },
@@ -22,20 +23,28 @@ const showcase = [
   { key:"museum", title:"Meridian Museum — Concept", blurb:"Editorial mood-first concept.", src:"/showcase/meridian-museum.png" },
 ];
 
-/* ---- Packages ---- */
 const packages = [
   { slug:"starter", name:"Starter", price:900, displayPrice:"$900", days:4, rushDays:2, rushFee:200,
-    blurb:"2–3 pages, modern motion, responsive. Fast launch.", perfectFor:"Cafés, barbers, freelancers",
-    features:["2–3 custom pages","Responsive + performance pass","Simple lead/contact form","Launch in days"], cta:"Start Starter" },
+    blurb:"2–3 pages, modern motion, responsive. Fast launch.",
+    perfectFor:"Founders, creators, boutique services",
+    features:["2–3 custom pages","Responsive + performance pass","Simple lead/contact form","Launch in days"],
+    cta:"Start Starter"
+  },
   { slug:"growth", name:"Growth", price:2300, displayPrice:"$2,300", days:8, rushDays:6, rushFee:400, highlight:true,
-    blurb:"5–7 pages, SEO + schema, booking, Maps, integrations.", perfectFor:"Dentists, gyms, restaurants, small firms",
-    features:["5–7 custom pages","On-page SEO + schema","Booking & Maps","3rd-party integrations","Content guidance"], cta:"Grow with Growth" },
+    blurb:"5–7 pages, SEO + schema, booking, Maps, integrations.",
+    perfectFor:"Clinics, gyms, restaurants, SMBs",
+    features:["5–7 custom pages","On-page SEO + schema","Booking & Maps","3rd-party integrations","Content guidance"],
+    cta:"Grow with Growth"
+  },
   { slug:"scale", name:"Scale", price:7000, displayPrice:"$7,000", days:14, rushDays:10, rushFee:800,
-    blurb:"10+ pages, strategy, advanced SEO + analytics, CRM/e-com.", perfectFor:"Law, real estate, healthcare, e-com",
-    features:["10+ pages","Strategy + funnel mapping","Advanced SEO + analytics","Booking / e-com / CRM","Copy support"], cta:"Scale with Scale" },
+    blurb:"10+ pages, strategy, advanced SEO + analytics, CRM/e-com.",
+    perfectFor:"Law, real estate, healthcare, e-com",
+    features:["10+ pages","Strategy + funnel mapping","Advanced SEO + analytics","Booking / e-com / CRM","Copy support"],
+    cta:"Scale with Scale"
+  },
 ];
 
-/* ---- Router ---- */
+/* ---------- Router ---------- */
 function useHashRoute(){
   const [hash, setHash] = useState(window.location.hash || "#/");
   useEffect(()=>{ const h=()=>setHash(window.location.hash || "#/"); window.addEventListener("hashchange",h); return ()=>window.removeEventListener("hashchange",h);},[]);
@@ -47,78 +56,61 @@ function useHashRoute(){
 function navigate(to){ window.location.hash = to.startsWith("#") ? to : `#${to}`; }
 function encodeFormData(data){ return new URLSearchParams(data).toString(); }
 
-/* ---- App ---- */
+/* ---------- App ---------- */
 export default function App(){
   const route = useHashRoute();
 
-  // deferred scroll (from rail links)
   useEffect(()=>{
-    const target = sessionStorage.getItem("scrollTo");
-    if (target && (route.path === "" || route.path === "/")) {
+    const t = sessionStorage.getItem("scrollTo");
+    if (t && (route.path === "" || route.path === "/")) {
       sessionStorage.removeItem("scrollTo");
-      const el = document.getElementById(target);
-      if (el) setTimeout(()=> el.scrollIntoView({behavior:"smooth", block:"start"}), 60);
+      const el = document.getElementById(t);
+      if (el) setTimeout(()=> el.scrollIntoView({ behavior:"smooth", block:"start"}), 60);
     }
   },[route.path]);
 
   return (
     <div className="min-h-screen">
-      <Rail/>
-      <main className="main">
-        {route.path === "" ? <Home/> :
-         route.path === "why-us" ? <WhyUs/> :
-         route.path === "projects" ? <Projects/> :
-         route.path === "brief" && route.rest[0] ? <Brief slug={route.rest[0]}/> :
-         route.path === "pay" && route.rest[0] ? <Pay slug={route.rest[0]}/> :
-         route.path === "thank-you" ? <ThankYou/> :
-         route.path === "privacy" ? <PrivacyPolicy/> :
-         route.path === "tech-terms" ? <TechTerms/> :
-         <NotFound/>}
-        <Footer/>
-        <NetlifyHiddenForms/>
-      </main>
+      <Topbar />
+      {route.path === "" ? <Home/> :
+       route.path === "why-us" ? <WhyUs/> :
+       route.path === "projects" ? <Projects/> :
+       route.path === "brief" && route.rest[0] ? <Brief slug={route.rest[0]}/> :
+       route.path === "pay" && route.rest[0] ? <Pay slug={route.rest[0]}/> :
+       route.path === "thank-you" ? <ThankYou/> :
+       route.path === "privacy" ? <PrivacyPolicy/> :
+       route.path === "tech-terms" ? <TechTerms/> :
+       <NotFound/>}
+      <Footer/>
+      <NetlifyHiddenForms/>
     </div>
   );
 }
 
-/* ================= Rail (Desktop) / Topbar (Mobile) ================= */
-function Rail(){
+/* ================= NAV ================= */
+function Topbar(){
   const [open, setOpen] = useState(false);
-  useEffect(()=>{ const onResize=()=>setOpen(false); window.addEventListener("resize",onResize); return ()=>window.removeEventListener("resize",onResize);},[]);
   const go = (id)=> (e)=>{ e.preventDefault(); sessionStorage.setItem("scrollTo", id); navigate("/"); setOpen(false); };
-
   return (
     <>
-      {/* Desktop rail — light */}
-      <aside className="rail hidden lg:flex flex-col justify-between px-6 py-6">
-        <div>
-          <a href="#/" className="ts-h4 font-semibold">CITEKS</a>
-          <div className="ts-h6 text-slate-600 mt-2">Oslo · New York · Amsterdam</div>
-          <nav className="mt-8 flex flex-col gap-3 ts-h6">
-            <a href="#/" className="hover:opacity-80">Home</a>
-            <a href="#/why-us" className="hover:opacity-80">Why us</a>
-            <a href="#/projects" className="hover:opacity-80">Projects</a>
-            <a href="#/" onClick={go("packages")} className="hover:opacity-80">Packages</a>
-            <a href="#/" onClick={go("contact")} className="btn btn-acc mt-2 w-max"><Mail className="w-4 h-4"/> Contact</a>
-          </nav>
-        </div>
-        <div className="ts-h6 text-slate-600">
-          <div className="flex items-center gap-2"><Globe2 className="w-4 h-4"/> English-first</div>
-          <div className="flex items-center gap-2"><Building2 className="w-4 h-4"/> Registered in NO/US/NL</div>
-          <div className="flex items-center gap-2"><Compass className="w-4 h-4"/> Conversion-led</div>
-        </div>
-      </aside>
-
-      {/* Mobile topbar */}
-      <div className="lg:hidden sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-[var(--hair)] px-4 py-3 flex items-center justify-between">
+      <div className="topbar px-4 lg:px-6 py-3 flex items-center justify-between">
         <a href="#/" className="ts-h5 font-semibold">CITEKS</a>
-        <button className="p-2" onClick={()=>setOpen(!open)} aria-label="Toggle menu">{open? <X className="w-6 h-6"/>:<Menu className="w-6 h-6"/>}</button>
+        <div className="hidden md:flex items-center gap-6 ts-h6">
+          <a href="#/" className="hover:opacity-80">Home</a>
+          <a href="#/why-us" className="hover:opacity-80">Why us</a>
+          <a href="#/projects" className="hover:opacity-80">Projects</a>
+          <a href="#/" onClick={go("packages")} className="hover:opacity-80">Packages</a>
+          <a href="#/" onClick={go("contact")} className="btn btn-acc"><Mail className="w-4 h-4"/> Contact</a>
+        </div>
+        <button className="md:hidden p-2" onClick={()=>setOpen(!open)} aria-label="Toggle menu">
+          {open? <X className="w-6 h-6"/> : <Menu className="w-6 h-6"/>}
+        </button>
       </div>
       <AnimatePresence>
         {open && (
           <motion.div
-            className="lg:hidden bg-white border-b border-[var(--hair)] px-4 py-3"
             initial={{height:0, opacity:0}} animate={{height:"auto", opacity:1}} exit={{height:0, opacity:0}}
+            className="md:hidden bg-white border-b border-[var(--hair)] px-4 py-3"
           >
             <nav className="flex flex-col gap-2 ts-h6">
               <a href="#/" onClick={()=>setOpen(false)} className="py-1">Home</a>
@@ -134,52 +126,46 @@ function Rail(){
   );
 }
 
-/* ================= Pages ================= */
+/* ================= HOME ================= */
 function Home(){
   return (
     <>
-      <ParallaxHero/>
-      <PinnedChapters/>
-      <RowShowcase/>
-      <Plans/>
-      <ContactBlock/>
+      <Hero />
+      <ProofBand />
+      <ServiceLadder />
+      <ShowcaseRow />
+      <PinnedWhy />
+      <ContactBlock />
     </>
   );
 }
 
-/* ---- Parallax Waterfall Hero ---- */
-function ParallaxHero(){
+/* ---- Hero (soft parallax, editorial headline) ---- */
+function Hero(){
   const ref = useRef(null);
   const prefersRM = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start","end start"] });
-  const yImg   = useTransform(scrollYProgress, [0,1], [0, prefersRM ? 0 : -120]); // bg drifts up
-  const yTitle = useTransform(scrollYProgress, [0,1], [0, prefersRM ? 0 : -40]);  // text slight parallax
-  const fade   = useTransform(scrollYProgress, [0,1], [1, prefersRM ? 1 : 0.75]);
+  const yImg   = useTransform(scrollYProgress, [0,1], [0, prefersRM ? 0 : -100]);
+  const yText  = useTransform(scrollYProgress, [0,1], [0, prefersRM ? 0 : -36]);
+  const fade   = useTransform(scrollYProgress, [0,1], [1, prefersRM ? 1 : 0.8]);
 
   return (
-    <section ref={ref} className="hero-shell">
-      {/* Background image */}
-      <motion.div
-        className="hero-img"
-        style={{
-          backgroundImage: "url('/hero/waterfall.jpg')",
-          y: yImg,
-          opacity: fade
-        }}
-      />
-      {/* Gentle color scrim matching accent; keeps photo readable with UI */}
-      <div className="hero-scrim" />
-      <div className="hero-bg" />
+    <section ref={ref} className="hero">
+      <motion.div className="hero-media" style={{
+        backgroundImage: "url('/hero/waterfall.jpg')",
+        y: yImg, opacity: fade
+      }}/>
+      <div className="hero-scrim"></div>
+      <div className="hero-vignette"></div>
 
-      {/* Foreground content */}
-      <div className="container h-full px-6 grid content-center">
-        <motion.div style={{ y: yTitle }}>
+      <div className="container h-full grid content-center">
+        <motion.div style={{ y: yText }}>
           <h1 className="ts-h1 font-semibold">
-            Quiet power. <span style={{color:"var(--accent)"}}>Clear outcomes.</span>
+            Websites engineered to convert —
+            <span style={{color:"var(--accent)"}}>quietly.</span>
           </h1>
           <p className="ts-h5 text-slate-700 mt-3 max-w-2xl">
-            We build premium, calm interfaces that guide to one choice per page. Editorial structure,
-            purposeful motion, and search-ready content—made to convert without noise.
+            Editorial structure. Purposeful motion. Search-ready. One goal per page, delivered fast.
           </p>
           <div className="flex items-center gap-4 mt-6">
             <a href="#/projects" className="ts-h6 inline-flex items-center gap-2 hover:opacity-90">
@@ -193,54 +179,82 @@ function ParallaxHero(){
               See packages
             </a>
           </div>
+          <div className="ts-h6 text-slate-600 mt-4 flex flex-wrap items-center gap-4">
+            <span className="flex items-center gap-2"><Globe2 className="w-4 h-4"/> English-first</span>
+            <span className="flex items-center gap-2"><Building2 className="w-4 h-4"/> Oslo · New York · Amsterdam</span>
+            <span className="flex items-center gap-2"><Compass className="w-4 h-4"/> Conversion-led</span>
+          </div>
         </motion.div>
       </div>
     </section>
   );
 }
 
-/* ---- Pinned Chapters (text moves, page pauses) ---- */
-function PinnedChapters(){
-  const steps = [
-    ["Clarity first", "Labels over slogans. One goal per page. The next action is never hidden."],
-    ["Trust quickly", "Proof, pricing, guarantees—above the fold to lower perceived risk."],
-    ["Motion with intent", "Micro-feedback to guide, not perform. Purpose > spectacle."],
-    ["Friction down", "Fast loads, short forms, accessible contrast. The easiest path wins."]
-  ];
-  const prefersRM = useReducedMotion();
-
+/* ---- Proof Band (logos/metrics scaffold) ---- */
+function ProofBand(){
   return (
-    <section className="chapter-wrap">
-      <div className="chapter-pin">
-        <div className="chapter-stage">
-          {steps.map((s, i)=>(
-            <ChapterLine key={i} index={i} title={s[0]} body={s[1]} total={steps.length} prefersRM={prefersRM}/>
-          ))}
+    <section className="container px-6 py-10 lg:py-14">
+      <div className="surface p-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Metric label="Projects delivered" value={200}/>
+          <Metric label="Avg. form uplift" value={34} suffix="%" />
+          <Metric label="Average build time" value={8} suffix=" days" />
         </div>
       </div>
     </section>
   );
 }
 
-function ChapterLine({ index, title, body, total, prefersRM }){
-  // Each block occupies equal slice of the scroll; we map viewport scroll to this item’s visibility
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end","end start"] });
-  const y = useTransform(scrollYProgress, [0,1], [20, 0]);
-  const op = useTransform(scrollYProgress, [0,1], [0.2, 1]);
+function Metric({ value, label, suffix="" }){
+  const prefersRM = useReducedMotion();
+  const [n,setN] = useState(0);
+  useEffect(()=>{
+    if (prefersRM) { setN(value); return; }
+    let f = 0, id = setInterval(()=>{ f+=1; const t = Math.min(value, Math.round((f/30)*value)); setN(t); if (t>=value) clearInterval(id); }, 16);
+    return ()=> clearInterval(id);
+  },[value, prefersRM]);
   return (
-    <div ref={ref} className="surface p-6 mb-4">
-      <motion.div style={{ y: prefersRM ? 0 : y, opacity: prefersRM ? 1 : op }}>
-        <div className="ts-h4 font-semibold">{title}</div>
-        <div className="ts-h6 text-slate-700">{body}</div>
-      </motion.div>
-      <div className="hair mt-4 pt-3 ts-h6 text-slate-500">{String(index+1).padStart(2,"0")} / {String(total).padStart(2,"0")}</div>
+    <div className="surface p-4">
+      <div className="ts-h2 font-semibold" style={{color:"var(--accent)"}}>{n}{suffix}</div>
+      <div className="ts-h6 text-slate-700">{label}</div>
     </div>
   );
 }
 
-/* ---- Horizontal snap “Selected work” with subtle motion ---- */
-function RowShowcase(){
+/* ---- Service Ladder (packages) ---- */
+function ServiceLadder(){
+  return (
+    <section id="packages" className="container px-6 py-10 lg:py-16">
+      <h2 className="ts-h2 font-semibold mb-6">Packages</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {packages.map(p=>(
+          <motion.div key={p.slug} initial={{opacity:0, y:12}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:.45}}
+            className={cx("surface p-6 flex flex-col", p.highlight && "ring-1 ring-[var(--accent)]")}
+          >
+            <div className="flex items-baseline justify-between">
+              <div className="ts-h4 font-semibold">{p.name}</div>
+              <div className="ts-h3 font-semibold" style={{color:"var(--accent)"}}>{p.displayPrice}</div>
+            </div>
+            <div className="ts-h6 text-slate-700 mt-1">{p.blurb}</div>
+            <div className="ts-h6 text-slate-600 mt-1">Perfect for: {p.perfectFor}</div>
+            <ul className="mt-3 space-y-2">
+              {p.features.map(f=>(
+                <li key={f} className="flex items-start gap-2 ts-h6">
+                  <Check className="w-5 h-5" style={{color:"var(--accent)"}}/><span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="ts-h6 text-slate-600 mt-3">Typical timeline: {p.days} days (rush {p.rushDays} days +${p.rushFee})</div>
+            <a href={`#/brief/${p.slug}`} className="btn btn-acc mt-4 self-start">{p.cta} <ArrowRight className="w-4 h-4"/></a>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ---- Horizontal showcase (side-snap) ---- */
+function ShowcaseRow(){
   const prefersRM = useReducedMotion();
   return (
     <section className="container px-6 py-10 lg:py-16">
@@ -249,7 +263,7 @@ function RowShowcase(){
         <a href="#/projects" className="ts-h6 hover:opacity-80">All projects</a>
       </div>
       <div className="snap-row">
-        {showcase.map(s => (
+        {showcase.map(s=>(
           <motion.figure
             key={s.key}
             className="surface overflow-hidden"
@@ -271,37 +285,39 @@ function RowShowcase(){
   );
 }
 
-/* ---- Plans (pricing strips) ---- */
-function Plans(){
+/* ---- Pinned “Why” chapters ---- */
+function PinnedWhy(){
+  const steps = [
+    ["Clarity beats clever", "One goal per page. Labels over slogans. Decisions become easy."],
+    ["Trust, fast", "Proof and transparent pricing high on the page reduce perceived risk."],
+    ["Motion with intent", "Micro-feedback that guides—not distracts. Purpose > spectacle."],
+    ["Friction down", "Fast loads, short forms, accessible contrast. The easiest path wins."]
+  ];
   return (
-    <section id="packages" className="container px-6 py-10 lg:py-16">
-      <h2 className="ts-h2 font-semibold mb-6">Packages</h2>
-      <div className="space-y-4">
-        {packages.map(p=>(
-          <motion.div key={p.slug} initial={{opacity:0, y:12}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:.45}}
-            className={cx("grid grid-cols-12 items-start surface", p.highlight && "ring-1 ring-[var(--accent)]")}
-          >
-            <div className="col-span-12 md:col-span-4 p-6 border-r border-[var(--hair)]">
-              <div className="ts-h4 font-semibold">{p.name}</div>
-              <div className="ts-h3 font-semibold" style={{color:"var(--accent)"}}>{p.displayPrice}</div>
-              <div className="ts-h6 text-slate-700 mt-1">{p.blurb}</div>
-              <div className="ts-h6 text-slate-600 mt-1">Perfect for: {p.perfectFor}</div>
-              <a href={`#/brief/${p.slug}`} className="btn btn-acc mt-4">{p.cta} <ArrowRight className="w-4 h-4"/></a>
-            </div>
-            <ul className="col-span-12 md:col-span-8 p-6 grid grid-cols-1 md:grid-cols-2 gap-3">
-              {p.features.map(f=>(
-                <li key={f} className="ts-h6 flex items-start gap-2">
-                  <Check className="w-5 h-5" style={{color:"var(--accent)"}}/><span>{f}</span>
-                </li>
-              ))}
-              <li className="md:col-span-2 ts-h6 text-slate-600 pt-2 hair mt-2">
-                Typical timeline: {p.days} days (rush {p.rushDays} days +${p.rushFee})
-              </li>
-            </ul>
-          </motion.div>
-        ))}
+    <section className="pin-wrap">
+      <div className="pin-stage">
+        <div className="container px-6 w-full max-w-[900px]">
+          {steps.map((s,i)=> <PinnedLine key={i} title={s[0]} body={s[1]} index={i} total={steps.length} />)}
+        </div>
       </div>
     </section>
+  );
+}
+
+function PinnedLine({ title, body, index, total }){
+  const ref = useRef(null);
+  const prefersRM = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end","end start"] });
+  const y = useTransform(scrollYProgress, [0,1], [20, 0]);
+  const op = useTransform(scrollYProgress, [0,1], [0.2, 1]);
+  return (
+    <div ref={ref} className="surface p-6 mb-4">
+      <motion.div style={{ y: prefersRM ? 0 : y, opacity: prefersRM ? 1 : op }}>
+        <div className="ts-h4 font-semibold">{title}</div>
+        <div className="ts-h6 text-slate-700">{body}</div>
+      </motion.div>
+      <div className="hair mt-4 pt-3 ts-h6 text-slate-500">{String(index+1).padStart(2,"0")} / {String(total).padStart(2,"0")}</div>
+    </div>
   );
 }
 
@@ -314,9 +330,7 @@ function ContactBlock(){
           <h2 className="ts-h2 font-semibold">Let’s build ROI</h2>
           <p className="ts-h6 text-slate-700 mt-2">Tell us about your goals. We’ll reply quickly.</p>
           <div className="ts-h6 text-slate-700 mt-4">Oslo · New York · Amsterdam</div>
-          <a href="mailto:contact@citeks.net" className="ts-h6 underline" style={{color:"var(--accent)"}}>
-            contact@citeks.net
-          </a>
+          <a href="mailto:contact@citeks.net" className="ts-h6 underline" style={{color:"var(--accent)"}}>contact@citeks.net</a>
         </div>
         <div className="lg:col-span-7"><ContactForm/></div>
       </div>
@@ -324,11 +338,10 @@ function ContactBlock(){
   );
 }
 
-/* ---- Contact Form (Netlify) ---- */
+/* ================= CONTACT FORM ================= */
 function ContactForm(){
   const [form, setForm] = useState({ title:"Mr", first:"", last:"", email:"", project:"", budget:"", message:"" });
-  const [sent, setSent] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [sent, setSent] = useState(false); const [errors, setErrors] = useState({});
   function v(){ const e={}; if(!form.first)e.first="Required"; if(!form.last)e.last="Required"; if(!/^\S+@\S+\.\S+$/.test(form.email)) e.email="Enter a valid email"; if(!form.project)e.project="Required"; if(!form.budget)e.budget="Required"; return e; }
   async function submit(e){ e.preventDefault(); const errs=v(); setErrors(errs); if(Object.keys(errs).length) return;
     try{ await fetch("/",{method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:encodeFormData({"form-name":"contact",...form})}); setSent(true);}catch{ alert("Submission failed. Please email contact@citeks.net");}
@@ -377,7 +390,7 @@ function Area({label, val, set, rows=4}){ return (
   </div>
 ); }
 
-/* ================= Projects ================= */
+/* ================= PROJECTS ================= */
 function Projects(){
   return (
     <section className="container px-6 py-10 lg:py-16">
@@ -400,7 +413,7 @@ function Projects(){
   );
 }
 
-/* ================= Why Us ================= */
+/* ================= WHY US ================= */
 function WhyUs(){
   const bullets = [
     ["Editorial bones", "Swiss grid with generous breathing room; clear proximity and alignment."],
@@ -423,7 +436,7 @@ function WhyUs(){
   );
 }
 
-/* ================= Brief & Pay (unchanged logic) ================= */
+/* ================= BRIEF / PAY / THANK YOU ================= */
 function Brief({ slug }){
   const pkg = packages.find(p=>p.slug===slug); if(!pkg) return <NotFound/>;
   const [rush, setRush] = useState(false);
@@ -513,10 +526,12 @@ function Pay({ slug }){
       <div className="surface p-6 mt-6">
         <div className="ts-h4 font-semibold">{pkg.name}</div>
         <div className="ts-h6 text-slate-700 mt-1">Base price {pkg.displayPrice}. Typical timeline {pkg.days} days.</div>
+
         <div className="flex items-center justify-between mt-4">
           <label className="ts-h6 flex items-center gap-2"><input type="checkbox" checked={rush} onChange={e=>setRush(e.target.checked)}/> Rush delivery: finish in {pkg.rushDays} days (+${pkg.rushFee})</label>
           <div className="ts-h4 font-semibold" style={{color:"var(--accent)"}}>Total: ${total}</div>
         </div>
+
         <div className="mt-6">{error && <div className="ts-h6 text-red-600 mb-3 whitespace-pre-wrap">{error}</div>}<div ref={containerRef} id="checkout" className="w-full"/></div>
         <div className="mt-4 ts-h6 text-slate-600">Secure payment powered by Stripe.</div>
       </div>
@@ -556,7 +571,7 @@ function ThankYou(){
   );
 }
 
-/* ================= Footer & Static Pages ================= */
+/* ================= FOOTER / STATIC ================= */
 function Footer(){
   return (
     <footer className="hair mt-12">
@@ -576,7 +591,7 @@ function PrivacyPolicy(){
         <p><b>Who we are.</b> CITEKS builds fast, modern websites that convert. Contact: contact@citeks.net.</p>
         <p><b>What we collect.</b> Form/brief submissions (including uploads). No cookies.</p>
         <p><b>Use of data.</b> Replies, proposals, service delivery, payments (Stripe), compliance.</p>
-        <p><b>Sharing.</b> Only with providers we use (Netlify, Stripe). No selling of personal data.</p>
+        <p><b>Sharing.</b> Only with providers we use (Netlify, Stripe). We don’t sell personal data.</p>
         <p><b>Retention.</b> Kept as needed for services and legal duties, then deleted/anonymized.</p>
         <p><b>Your rights.</b> Email contact@citeks.net for access/correction/deletion.</p>
       </div>
@@ -609,7 +624,7 @@ function TechTerms(){
   );
 }
 
-/* Hidden Netlify forms (build detection) */
+/* Hidden Netlify form stubs (build detection) */
 function NetlifyHiddenForms(){
   return (
     <div style={{display:"none"}}>
