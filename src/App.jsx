@@ -1,19 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { ArrowRight, Mail, Menu, X, Building2, Globe2, Compass, Check } from "lucide-react";
 
 /**
- * CITEKS — Atelier (new skeleton)
- * - Left rail (desktop), top bar (mobile)
- * - Hero = oversized editorial type on dark canvas
- * - Showcase = horizontal snap gallery (no carousel)
- * - Systems kept: hash routes, Netlify forms, Stripe Embedded Checkout
- * Routes: /#/, /#/why-us, /#/projects, /#/brief/:slug, /#/pay/:slug, /#/thank-you, /#/privacy, /#/tech-terms
+ * CITEKS — Light + Motion pass
+ * - Waterfall parallax hero (no scroll-jack; honors reduced motion)
+ * - Pinned chapters with text transitions
+ * - Horizontal snap showcase with subtle scale
+ * - Keeps routes, forms, and Stripe flow intact
  */
 
 function cx(...c){ return c.filter(Boolean).join(" "); }
 
-/* ---- Showcase Data (images live in /public/showcase) ---- */
+/* ---- Showcase Data ---- */
 const showcase = [
   { key:"law", title:"Harbor & Sage Law — Scale", blurb:"Editorial architecture for business law.", src:"/showcase/harbor-sage-law.png" },
   { key:"vigor-hero", title:"Vigor Lab — Growth", blurb:"High-energy hero + programs grid.", src:"/showcase/vigor-lab-hero.png" },
@@ -90,11 +89,11 @@ function Rail(){
 
   return (
     <>
-      {/* Desktop rail */}
+      {/* Desktop rail — light */}
       <aside className="rail hidden lg:flex flex-col justify-between px-6 py-6">
         <div>
           <a href="#/" className="ts-h4 font-semibold">CITEKS</a>
-          <div className="ts-h6 text-white/60 mt-2">Oslo · New York · Amsterdam</div>
+          <div className="ts-h6 text-slate-600 mt-2">Oslo · New York · Amsterdam</div>
           <nav className="mt-8 flex flex-col gap-3 ts-h6">
             <a href="#/" className="hover:opacity-80">Home</a>
             <a href="#/why-us" className="hover:opacity-80">Why us</a>
@@ -103,7 +102,7 @@ function Rail(){
             <a href="#/" onClick={go("contact")} className="btn btn-acc mt-2 w-max"><Mail className="w-4 h-4"/> Contact</a>
           </nav>
         </div>
-        <div className="ts-h6 text-white/50">
+        <div className="ts-h6 text-slate-600">
           <div className="flex items-center gap-2"><Globe2 className="w-4 h-4"/> English-first</div>
           <div className="flex items-center gap-2"><Building2 className="w-4 h-4"/> Registered in NO/US/NL</div>
           <div className="flex items-center gap-2"><Compass className="w-4 h-4"/> Conversion-led</div>
@@ -111,14 +110,14 @@ function Rail(){
       </aside>
 
       {/* Mobile topbar */}
-      <div className="lg:hidden sticky top-0 z-50 bg-[#0f131a]/90 backdrop-blur border-b border-[var(--hair)] px-4 py-3 flex items-center justify-between">
+      <div className="lg:hidden sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-[var(--hair)] px-4 py-3 flex items-center justify-between">
         <a href="#/" className="ts-h5 font-semibold">CITEKS</a>
         <button className="p-2" onClick={()=>setOpen(!open)} aria-label="Toggle menu">{open? <X className="w-6 h-6"/>:<Menu className="w-6 h-6"/>}</button>
       </div>
       <AnimatePresence>
         {open && (
           <motion.div
-            className="lg:hidden bg-[#0f131a] border-b border-[var(--hair)] px-4 py-3"
+            className="lg:hidden bg-white border-b border-[var(--hair)] px-4 py-3"
             initial={{height:0, opacity:0}} animate={{height:"auto", opacity:1}} exit={{height:0, opacity:0}}
           >
             <nav className="flex flex-col gap-2 ts-h6">
@@ -139,46 +138,110 @@ function Rail(){
 function Home(){
   return (
     <>
-      <Hero/>
+      <ParallaxHero/>
+      <PinnedChapters/>
       <RowShowcase/>
-      <Method/>
       <Plans/>
       <ContactBlock/>
     </>
   );
 }
 
-/* ---- Hero: big editorial on dark canvas (no photo) ---- */
-function Hero(){
+/* ---- Parallax Waterfall Hero ---- */
+function ParallaxHero(){
+  const ref = useRef(null);
+  const prefersRM = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start","end start"] });
+  const yImg   = useTransform(scrollYProgress, [0,1], [0, prefersRM ? 0 : -120]); // bg drifts up
+  const yTitle = useTransform(scrollYProgress, [0,1], [0, prefersRM ? 0 : -40]);  // text slight parallax
+  const fade   = useTransform(scrollYProgress, [0,1], [1, prefersRM ? 1 : 0.75]);
+
   return (
-    <section className="relative overflow-clip">
-      <div className="hero-bg"/>
-      <div className="main container px-6 py-16 lg:py-28">
-        <div className="max-w-3xl">
+    <section ref={ref} className="hero-shell">
+      {/* Background image */}
+      <motion.div
+        className="hero-img"
+        style={{
+          backgroundImage: "url('/hero/waterfall.jpg')",
+          y: yImg,
+          opacity: fade
+        }}
+      />
+      {/* Gentle color scrim matching accent; keeps photo readable with UI */}
+      <div className="hero-scrim" />
+      <div className="hero-bg" />
+
+      {/* Foreground content */}
+      <div className="container h-full px-6 grid content-center">
+        <motion.div style={{ y: yTitle }}>
           <h1 className="ts-h1 font-semibold">
-            Websites that <span className="text-[var(--accent)]">convert</span>—
-            engineered with restraint.
+            Quiet power. <span style={{color:"var(--accent)"}}>Clear outcomes.</span>
           </h1>
-          <p className="ts-h5 text-white/70 mt-3">
-            We ship calm, fast, premium interfaces that push one decision per page.
-            Editorial structure. Motion with purpose. SEO-ready. Easy to run.
+          <p className="ts-h5 text-slate-700 mt-3 max-w-2xl">
+            We build premium, calm interfaces that guide to one choice per page. Editorial structure,
+            purposeful motion, and search-ready content—made to convert without noise.
           </p>
           <div className="flex items-center gap-4 mt-6">
             <a href="#/projects" className="ts-h6 inline-flex items-center gap-2 hover:opacity-90">
               View projects <ArrowRight className="w-4 h-4"/>
             </a>
-            <a href="#/" onClick={(e)=>{e.preventDefault(); sessionStorage.setItem("scrollTo","packages"); navigate("/");}}
-               className="btn btn-acc">See packages</a>
+            <a
+              href="#/"
+              onClick={(e)=>{e.preventDefault(); sessionStorage.setItem("scrollTo","packages"); navigate("/");}}
+              className="btn btn-acc"
+            >
+              See packages
+            </a>
           </div>
-        </div>
+        </motion.div>
       </div>
-      <div className="hair opacity-50"/>
     </section>
   );
 }
 
-/* ---- Horizontal snap “Selected work” ---- */
+/* ---- Pinned Chapters (text moves, page pauses) ---- */
+function PinnedChapters(){
+  const steps = [
+    ["Clarity first", "Labels over slogans. One goal per page. The next action is never hidden."],
+    ["Trust quickly", "Proof, pricing, guarantees—above the fold to lower perceived risk."],
+    ["Motion with intent", "Micro-feedback to guide, not perform. Purpose > spectacle."],
+    ["Friction down", "Fast loads, short forms, accessible contrast. The easiest path wins."]
+  ];
+  const prefersRM = useReducedMotion();
+
+  return (
+    <section className="chapter-wrap">
+      <div className="chapter-pin">
+        <div className="chapter-stage">
+          {steps.map((s, i)=>(
+            <ChapterLine key={i} index={i} title={s[0]} body={s[1]} total={steps.length} prefersRM={prefersRM}/>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ChapterLine({ index, title, body, total, prefersRM }){
+  // Each block occupies equal slice of the scroll; we map viewport scroll to this item’s visibility
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end","end start"] });
+  const y = useTransform(scrollYProgress, [0,1], [20, 0]);
+  const op = useTransform(scrollYProgress, [0,1], [0.2, 1]);
+  return (
+    <div ref={ref} className="surface p-6 mb-4">
+      <motion.div style={{ y: prefersRM ? 0 : y, opacity: prefersRM ? 1 : op }}>
+        <div className="ts-h4 font-semibold">{title}</div>
+        <div className="ts-h6 text-slate-700">{body}</div>
+      </motion.div>
+      <div className="hair mt-4 pt-3 ts-h6 text-slate-500">{String(index+1).padStart(2,"0")} / {String(total).padStart(2,"0")}</div>
+    </div>
+  );
+}
+
+/* ---- Horizontal snap “Selected work” with subtle motion ---- */
 function RowShowcase(){
+  const prefersRM = useReducedMotion();
   return (
     <section className="container px-6 py-10 lg:py-16">
       <div className="flex items-center justify-between mb-4">
@@ -187,41 +250,22 @@ function RowShowcase(){
       </div>
       <div className="snap-row">
         {showcase.map(s => (
-          <figure key={s.key} className="surface overflow-hidden">
+          <motion.figure
+            key={s.key}
+            className="surface overflow-hidden"
+            whileInView={prefersRM ? {} : { scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 120, damping: 18 }}
+            viewport={{ once: true, amount: 0.6 }}
+          >
             <div className="relative" style={{aspectRatio:"2/1"}}>
-              <img src={s.src} alt={s.title} className="absolute inset-0 w-full h-full object-contain bg-[#0b0f15]"/>
+              <img src={s.src} alt={s.title} className="absolute inset-0 w-full h-full object-contain bg-white"/>
             </div>
             <figcaption className="p-4">
               <div className="ts-h6 font-semibold">{s.title}</div>
-              <div className="ts-h6 text-white/60">{s.blurb}</div>
+              <div className="ts-h6 text-slate-700">{s.blurb}</div>
             </figcaption>
-          </figure>
+          </motion.figure>
         ))}
-      </div>
-    </section>
-  );
-}
-
-/* ---- Method (compact 4-up) ---- */
-function Method(){
-  const items = [
-    ["Clarity first", "One goal per page. Labels, not slogans."],
-    ["Trust quickly", "Proof, pricing, and guarantees up-front."],
-    ["Motion with intent", "Micro-feedback that guides—not performs."],
-    ["Friction down", "Fast loads, short forms, clear paths."],
-  ];
-  return (
-    <section className="container px-6 py-10 lg:py-16">
-      <div className="surface p-6">
-        <h2 className="ts-h2 font-semibold mb-2">Method</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {items.map(([t, d])=>(
-            <div key={t} className="border border-[var(--hair)] rounded-lg p-4">
-              <div className="ts-h5 font-semibold">{t}</div>
-              <div className="ts-h6 text-white/70">{d}</div>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );
@@ -239,18 +283,18 @@ function Plans(){
           >
             <div className="col-span-12 md:col-span-4 p-6 border-r border-[var(--hair)]">
               <div className="ts-h4 font-semibold">{p.name}</div>
-              <div className="ts-h3 font-semibold text-[var(--accent)] mt-1">{p.displayPrice}</div>
-              <div className="ts-h6 text-white/70 mt-1">{p.blurb}</div>
-              <div className="ts-h6 text-white/60 mt-1">Perfect for: {p.perfectFor}</div>
+              <div className="ts-h3 font-semibold" style={{color:"var(--accent)"}}>{p.displayPrice}</div>
+              <div className="ts-h6 text-slate-700 mt-1">{p.blurb}</div>
+              <div className="ts-h6 text-slate-600 mt-1">Perfect for: {p.perfectFor}</div>
               <a href={`#/brief/${p.slug}`} className="btn btn-acc mt-4">{p.cta} <ArrowRight className="w-4 h-4"/></a>
             </div>
             <ul className="col-span-12 md:col-span-8 p-6 grid grid-cols-1 md:grid-cols-2 gap-3">
               {p.features.map(f=>(
                 <li key={f} className="ts-h6 flex items-start gap-2">
-                  <Check className="w-5 h-5 text-[var(--accent)] mt-0.5"/><span>{f}</span>
+                  <Check className="w-5 h-5" style={{color:"var(--accent)"}}/><span>{f}</span>
                 </li>
               ))}
-              <li className="md:col-span-2 ts-h6 text-white/60 pt-2 hair mt-2">
+              <li className="md:col-span-2 ts-h6 text-slate-600 pt-2 hair mt-2">
                 Typical timeline: {p.days} days (rush {p.rushDays} days +${p.rushFee})
               </li>
             </ul>
@@ -268,9 +312,9 @@ function ContactBlock(){
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-5 surface p-6">
           <h2 className="ts-h2 font-semibold">Let’s build ROI</h2>
-          <p className="ts-h6 text-white/70 mt-2">Tell us about your goals. We’ll reply quickly.</p>
-          <div className="ts-h6 text-white/80 mt-4">Oslo · New York · Amsterdam</div>
-          <a href="mailto:contact@citeks.net" className="ts-h6 underline text-[var(--accent)] mt-2 inline-block">
+          <p className="ts-h6 text-slate-700 mt-2">Tell us about your goals. We’ll reply quickly.</p>
+          <div className="ts-h6 text-slate-700 mt-4">Oslo · New York · Amsterdam</div>
+          <a href="mailto:contact@citeks.net" className="ts-h6 underline" style={{color:"var(--accent)"}}>
             contact@citeks.net
           </a>
         </div>
@@ -307,24 +351,24 @@ function ContactForm(){
           className={cx("w-full bg-transparent border rounded-lg p-3", errors.budget?"border-red-500":"border-[var(--hair)]")}>
           <option value="">Select…</option><option>Up to $1,000</option><option>$1,000 – $2,500</option><option>$2,500 – $7,000</option><option>$7,000+</option>
         </select>
-        {errors.budget && <div className="ts-h6 text-red-400 mt-1">{errors.budget}</div>}
+        {errors.budget && <div className="ts-h6 text-red-600 mt-1">{errors.budget}</div>}
       </Field>
       <Area label="Message" val={form.message} set={v=>setForm({...form, message:v})} rows={5}/>
       <div className="md:col-span-2 flex items-center justify-between">
-        <div className="ts-h6 text-white/60">No spam. We reply within 24h.</div>
+        <div className="ts-h6 text-slate-600">No spam. We reply within 24h.</div>
         <button className="btn btn-acc" type="submit"><Mail className="w-4 h-4"/> Send</button>
       </div>
-      {sent && <div className="md:col-span-2 ts-h6 text-emerald-300">Thanks! Your message is in.</div>}
+      {sent && <div className="md:col-span-2 ts-h6 text-emerald-700">Thanks! Your message is in.</div>}
     </form>
   );
 }
 
-/* form field helpers */
+/* Field helpers */
 function Field({label, children}){ return (<div><label className="ts-h6 block mb-1">{label}</label>{children}</div>); }
 function Input({label, val, set, err, type="text"}){ return (
   <Field label={label}>
     <input type={type} value={val} onChange={e=>set(e.target.value)} className={cx("w-full bg-transparent border rounded-lg p-3", err?"border-red-500":"border-[var(--hair)]")}/>
-    {err && <div className="ts-h6 text-red-400 mt-1">{err}</div>}
+    {err && <div className="ts-h6 text-red-600 mt-1">{err}</div>}
   </Field>
 ); }
 function Area({label, val, set, rows=4}){ return (
@@ -333,7 +377,7 @@ function Area({label, val, set, rows=4}){ return (
   </div>
 ); }
 
-/* ================= Projects Page ================= */
+/* ================= Projects ================= */
 function Projects(){
   return (
     <section className="container px-6 py-10 lg:py-16">
@@ -343,12 +387,12 @@ function Projects(){
           <article key={s.key} className="surface overflow-hidden">
             <div className="px-6 pt-6 flex items-center justify-between">
               <div className="ts-h5 font-semibold">{s.title}</div>
-              <div className="ts-h6 text-white/50">#{String(i+1).padStart(2,"0")}</div>
+              <div className="ts-h6 text-slate-500">#{String(i+1).padStart(2,"0")}</div>
             </div>
             <div className="mt-4" style={{aspectRatio:"2/1"}}>
-              <img src={s.src} alt={s.title} className="w-full h-full object-contain bg-[#0b0f15]"/>
+              <img src={s.src} alt={s.title} className="w-full h-full object-contain bg-white"/>
             </div>
-            <p className="ts-h6 text-white/70 p-6">{s.blurb}</p>
+            <p className="ts-h6 text-slate-700 p-6">{s.blurb}</p>
           </article>
         ))}
       </div>
@@ -371,7 +415,7 @@ function WhyUs(){
         {bullets.map(([t,d])=>(
           <div key={t} className="surface p-6">
             <div className="ts-h4 font-semibold">{t}</div>
-            <div className="ts-h6 text-white/70">{d}</div>
+            <div className="ts-h6 text-slate-700">{d}</div>
           </div>
         ))}
       </div>
@@ -379,7 +423,7 @@ function WhyUs(){
   );
 }
 
-/* ================= Brief & Pay (Stripe flow preserved) ================= */
+/* ================= Brief & Pay (unchanged logic) ================= */
 function Brief({ slug }){
   const pkg = packages.find(p=>p.slug===slug); if(!pkg) return <NotFound/>;
   const [rush, setRush] = useState(false);
@@ -399,7 +443,7 @@ function Brief({ slug }){
   return (
     <section className="container px-6 py-10 lg:py-16">
       <h1 className="ts-h2 font-semibold">{pkg.name} brief</h1>
-      <p className="ts-h6 text-white/70 mt-1">{pkg.displayPrice} · Typical timeline: {pkg.days} days (rush {pkg.rushDays} days +${pkg.rushFee})</p>
+      <p className="ts-h6 text-slate-700 mt-1">{pkg.displayPrice} · Typical timeline: {pkg.days} days (rush {pkg.rushDays} days +${pkg.rushFee})</p>
       <form name={`brief-${pkg.slug}`} data-netlify="true" netlify-honeypot="bot-field" encType="multipart/form-data" onSubmit={submit}
         className="surface p-6 grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         <input type="hidden" name="form-name" value={`brief-${pkg.slug}`}/><input type="hidden" name="bot-field"/>
@@ -412,8 +456,8 @@ function Brief({ slug }){
         <Area label="Available assets — notes" val={form.assetsNote} set={v=>setForm({...form, assetsNote:v})}/>
         <Field label="Upload assets (images, logos, docs)">
           <input type="file" multiple onChange={(e)=>setFiles(e.target.files)} className="w-full bg-transparent border border-[var(--hair)] rounded-lg p-3"/>
-          <div className="ts-h6 text-white/60 mt-1">Attach multiple files if needed.</div>
-          {err.assetsNote && <div className="ts-h6 text-red-400 mt-1">{err.assetsNote}</div>}
+          <div className="ts-h6 text-slate-600 mt-1">Attach multiple files if needed.</div>
+          {err.assetsNote && <div className="ts-h6 text-red-600 mt-1">{err.assetsNote}</div>}
         </Field>
         <Area label="SEO targets (keywords/locations)" val={form.seo} set={v=>setForm({...form,seo:v})}/>
         <Input label="Integrations (maps, booking, payments)" val={form.integrations} set={v=>setForm({...form,integrations:v})}/>
@@ -424,7 +468,7 @@ function Brief({ slug }){
         <Area label="Notes / constraints" val={form.notes} set={v=>setForm({...form,notes:v})}/>
         <div className="md:col-span-2 flex items-center justify-between hair pt-4">
           <label className="ts-h6 flex items-center gap-2"><input type="checkbox" checked={rush} onChange={e=>setRush(e.target.checked)}/> Rush delivery: finish in {pkg.rushDays} days (+${pkg.rushFee})</label>
-          <div className="ts-h5 font-semibold text-[var(--accent)]">Total: ${total}</div>
+          <div className="ts-h5 font-semibold" style={{color:"var(--accent)"}}>Total: ${total}</div>
         </div>
         <div className="md:col-span-2 flex items-center justify-end">
           <button className="btn btn-acc">Continue <ArrowRight className="w-4 h-4"/></button>
@@ -468,13 +512,13 @@ function Pay({ slug }){
       <h1 className="ts-h2 font-semibold">Payment</h1>
       <div className="surface p-6 mt-6">
         <div className="ts-h4 font-semibold">{pkg.name}</div>
-        <div className="ts-h6 text-white/70 mt-1">Base price {pkg.displayPrice}. Typical timeline {pkg.days} days.</div>
+        <div className="ts-h6 text-slate-700 mt-1">Base price {pkg.displayPrice}. Typical timeline {pkg.days} days.</div>
         <div className="flex items-center justify-between mt-4">
           <label className="ts-h6 flex items-center gap-2"><input type="checkbox" checked={rush} onChange={e=>setRush(e.target.checked)}/> Rush delivery: finish in {pkg.rushDays} days (+${pkg.rushFee})</label>
-          <div className="ts-h4 font-semibold text-[var(--accent)]">Total: ${total}</div>
+          <div className="ts-h4 font-semibold" style={{color:"var(--accent)"}}>Total: ${total}</div>
         </div>
-        <div className="mt-6">{error && <div className="ts-h6 text-red-400 mb-3 whitespace-pre-wrap">{error}</div>}<div ref={containerRef} id="checkout" className="w-full"/></div>
-        <div className="mt-4 ts-h6 text-white/60">Secure payment powered by Stripe.</div>
+        <div className="mt-6">{error && <div className="ts-h6 text-red-600 mb-3 whitespace-pre-wrap">{error}</div>}<div ref={containerRef} id="checkout" className="w-full"/></div>
+        <div className="mt-4 ts-h6 text-slate-600">Secure payment powered by Stripe.</div>
       </div>
     </section>
   );
@@ -492,21 +536,21 @@ function ThankYou(){
   return (
     <section className="container px-6 py-16">
       <h1 className="ts-h2 font-semibold mb-2">Thank you!</h1>
-      <p className="ts-h6 text-white/70">We’ll email you shortly from <b>contact@citeks.net</b> with next steps.</p>
+      <p className="ts-h6 text-slate-700">We’ll email you shortly from <b>contact@citeks.net</b> with next steps.</p>
       {summary && (
         <div className="surface p-6 mt-6">
           <div className="ts-h5 font-semibold">Purchase summary</div>
-          <div className="ts-h6 text-white/80 mt-2 space-y-1">
+          <div className="ts-h6 text-slate-800 mt-2 space-y-1">
             <div><b>Status:</b> {summary.payment_status}</div>
             <div><b>Transaction ID:</b> {summary.payment_intent_id || "—"}</div>
             <div><b>Package:</b> {summary.metadata?.package || "—"}</div>
             <div><b>Rush:</b> {summary.metadata?.rush === "true" ? "Yes":"No"}</div>
             <div><b>Total:</b> {niceTotal}</div>
           </div>
-          <div className="ts-h6 text-white/70 mt-3">Forgot something? Use the <a href="#/" onClick={(e)=>{e.preventDefault(); sessionStorage.setItem("scrollTo","contact"); navigate("/");}} className="underline">contact form</a> and include your Transaction ID.</div>
+          <div className="ts-h6 text-slate-700 mt-3">Forgot something? Use the <a href="#/" onClick={(e)=>{e.preventDefault(); sessionStorage.setItem("scrollTo","contact"); navigate("/");}} className="underline">contact form</a> and include your Transaction ID.</div>
         </div>
       )}
-      {error && <div className="ts-h6 text-red-400 mt-4">{error}</div>}
+      {error && <div className="ts-h6 text-red-600 mt-4">{error}</div>}
       <a href="#/" className="btn btn-acc mt-6">Back to home</a>
     </section>
   );
@@ -517,7 +561,7 @@ function Footer(){
   return (
     <footer className="hair mt-12">
       <div className="container px-6 py-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-        <div className="ts-h6 text-white/70">© {new Date().getFullYear()} CITEKS — Oslo · New York · Amsterdam</div>
+        <div className="ts-h6 text-slate-600">© {new Date().getFullYear()} CITEKS — Oslo · New York · Amsterdam</div>
         <div className="ts-h6"><a href="#/privacy" className="hover:opacity-80 mr-4">Privacy</a><a href="#/tech-terms" className="hover:opacity-80">Technical terms</a></div>
       </div>
     </footer>
@@ -528,7 +572,7 @@ function PrivacyPolicy(){
   return (
     <section className="container px-6 py-16">
       <h1 className="ts-h1 font-semibold mb-4">Privacy Policy</h1>
-      <div className="surface p-6 ts-h6 text-white/80 space-y-3">
+      <div className="surface p-6 ts-h6 text-slate-800 space-y-3">
         <p><b>Who we are.</b> CITEKS builds fast, modern websites that convert. Contact: contact@citeks.net.</p>
         <p><b>What we collect.</b> Form/brief submissions (including uploads). No cookies.</p>
         <p><b>Use of data.</b> Replies, proposals, service delivery, payments (Stripe), compliance.</p>
@@ -558,7 +602,7 @@ function TechTerms(){
     <section className="container px-6 py-16">
       <h1 className="ts-h1 font-semibold mb-4">Technical terms</h1>
       <div className="surface p-6">
-        <ul className="ts-h6 text-white/80 space-y-2">{rows.map(([t,d])=> <li key={t}><b>{t}:</b> {d}</li>)}</ul>
+        <ul className="ts-h6 text-slate-800 space-y-2">{rows.map(([t,d])=> <li key={t}><b>{t}:</b> {d}</li>)}</ul>
       </div>
       <a href="#/" className="btn btn-acc mt-6">Back to home</a>
     </section>
