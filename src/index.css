@@ -2,14 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== Atelier Tokens ===== */
+/* ===== Atelier Light Tokens ===== */
 :root{
-  --ink: #0c0e12;            /* canvas (90% usage) */
-  --paper: #f5f5f2;          /* text on dark + surfaces */
-  --stone: #1b2028;          /* panels / rails */
-  --hair: #262c36;           /* dividers */
-  --accent: #00c7a5;         /* action (10%) */
-  --accent-900: #00a388;
+  /* Palette (60/30/10) */
+  --canvas: #f4f3ef;        /* 60% base (very light warm grey) */
+  --ink: #0f172a;           /* primary text */
+  --stone: #ffffff;         /* surfaces / rail */
+  --hair: #e5e7eb;          /* dividers */
+  --accent: #0a7d5d;        /* forest accent */
+  --accent-900: #065f47;    /* hover */
 
   /* Major Third scale */
   --ts-p: 16px; --ts-h6: 20px; --ts-h5: 25px; --ts-h4: 31.25px;
@@ -20,8 +21,8 @@
 
 html, body, #root { height: 100%; }
 body {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--canvas);
+  color: var(--ink);
   font-family: "Assistant", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
 }
@@ -35,7 +36,7 @@ body {
 .ts-h2{ font-size: var(--ts-h2); line-height:1.1; letter-spacing:-0.018em; font-family:"EB Garamond",serif;}
 .ts-h1{ font-size: var(--ts-h1); line-height:1.0; letter-spacing:-0.02em;  font-family:"EB Garamond",serif;}
 
-/* Layout primitives */
+/* Layout */
 .container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
 .rail { width: 280px; background: var(--stone); border-right: 1px solid var(--hair); position: fixed; inset: 0 auto 0 0; z-index: 40; }
 .main { margin-left: 280px; }
@@ -47,16 +48,27 @@ body {
 
 /* Elements */
 .btn { @apply inline-flex items-center gap-2 rounded-full px-5 py-2 ts-h6; }
-.btn-acc { background: var(--accent); color: #06231f; }
+.btn-acc { background: var(--accent); color: #effcf8; }
 .btn-acc:hover{ background: var(--accent-900); }
-
-.surface { background: #10141b; border:1px solid var(--hair); border-radius: 16px; }
+.surface { background: var(--stone); border:1px solid var(--hair); border-radius: 16px; }
 .hair { border-top: 1px solid var(--hair); }
 
-/* Horizontal snap scroller */
+/* Horizontal snap track */
 .snap-row { display: grid; grid-auto-flow: column; grid-auto-columns: 82%; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
 .snap-row > * { scroll-snap-align: center; }
 @media (min-width:1280px){ .snap-row{ grid-auto-columns: 48%; }}
+
+/* Pinned chapters scaffold */
+.chapter-wrap { position: relative; height: 260vh; }
+.chapter-pin  { position: sticky; top: 0; height: 100vh; display: grid; place-items: center; }
+.chapter-stage{ width: min(1000px, 92vw); }
+
+/* Hero image layers */
+.hero-shell { position: relative; height: 88vh; min-height: 560px; border-bottom: 1px solid var(--hair); overflow: clip; }
+.hero-bg   { position:absolute; inset:0; background: radial-gradient(900px 400px at 10% -10%, rgba(10,125,93,.18), transparent 60%),
+                                      radial-gradient(700px 500px at 110% 30%, rgba(10,125,93,.14), transparent 60%); }
+.hero-img  { position:absolute; inset:0; background-size: cover; background-position: center; filter: saturate(1.05) contrast(1.05); }
+.hero-scrim{ position:absolute; inset:0; background: linear-gradient(to bottom, rgba(10,10,10,.25), rgba(10,10,10,.15), rgba(255,255,255,0)); mix-blend-multiply; }
 
 /* Tablet & Mobile type scale */
 @media (min-width: 481px) and (max-width:1024px){
@@ -64,13 +76,4 @@ body {
 }
 @media (max-width:480px){
   :root{ --ts-p:16px; --ts-h1:39.06px; --ts-h2:31.25px; --ts-h3:25px; --ts-h4:20px; --ts-h5:16px; --ts-h6:14px; }
-}
-
-/* Decorative grid/texture behind hero */
-.hero-bg{
-  position:absolute; inset:0; pointer-events:none;
-  background:
-    radial-gradient(1000px 500px at 10% -10%, rgba(0,199,165,.12), transparent 60%),
-    radial-gradient(800px 400px at 110% 20%, rgba(0,199,165,.10), transparent 60%),
-    radial-gradient(600px 600px at 80% 120%, rgba(255,255,255,.05), transparent 60%);
 }
