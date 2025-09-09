@@ -3,41 +3,37 @@ import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } fr
 import { ArrowRight, Mail, Menu, X, Check, Globe2, Building2, Compass } from "lucide-react";
 
 /**
- * CITEKS — New Visual Skeleton (no reuse from previous designs)
- * - Top nav (sticky, glass) + light canvas
- * - Hero: photo backdrop (optional) + soft parallax; large editorial headline
- * - Early proof, service ladder, horizontal showcase, pinned “why us” chapters
- * - Packages, contact, projects, brief/pay/thank-you, static pages
- * - Hash routes preserved: /#/, /#/why-us, /#/projects, /#/brief/:slug, /#/pay/:slug, /#/thank-you, /#/privacy, /#/tech-terms
+ * CITEKS — Refined skeleton (smaller type, thin lines, stronger value messaging)
+ * Routes preserved: /#/, /#/why-us, /#/projects, /#/brief/:slug, /#/pay/:slug, /#/thank-you, /#/privacy, /#/tech-terms
  */
 
 function cx(...c) { return c.filter(Boolean).join(" "); }
 
 /* ---------- Data ---------- */
 const showcase = [
-  { key:"law", title:"Harbor & Sage Law — Scale", blurb:"Editorial architecture for business law.", src:"/showcase/harbor-sage-law.png" },
-  { key:"vigor-hero", title:"Vigor Lab — Growth", blurb:"High-energy hero + programs grid.", src:"/showcase/vigor-lab-hero.png" },
-  { key:"vigor-prog", title:"Vigor Lab — Programs", blurb:"Frictionless matrix to act fast.", src:"/showcase/vigor-lab-programs.png" },
-  { key:"barber", title:"Urban Barber — Starter", blurb:"Warm tones, craft-led booking.", src:"/showcase/urban-barber.png" },
-  { key:"ai", title:"SentienceWorks — Growth", blurb:"Futuristic palette, clear copy.", src:"/showcase/sentienceworks-ai.png" },
-  { key:"museum", title:"Meridian Museum — Concept", blurb:"Editorial mood-first concept.", src:"/showcase/meridian-museum.png" },
+  { key:"law", title:"Harbor & Sage Law — Scale", blurb:"Editorial architecture for a business law firm.", src:"/showcase/harbor-sage-law.png" },
+  { key:"vigor-hero", title:"Vigor Lab — Growth", blurb:"High-energy hero + clear programs matrix.", src:"/showcase/vigor-lab-hero.png" },
+  { key:"vigor-prog", title:"Vigor Lab — Programs", blurb:"Frictionless grid that speeds sign-ups.", src:"/showcase/vigor-lab-programs.png" },
+  { key:"barber", title:"Urban Barber — Starter", blurb:"Warm tones, craft-led structure, clean booking.", src:"/showcase/urban-barber.png" },
+  { key:"ai", title:"SentienceWorks — Growth", blurb:"Futuristic palette, clear copy, purposeful motion.", src:"/showcase/sentienceworks-ai.png" },
+  { key:"museum", title:"Meridian Museum — Concept", blurb:"Editorial concept focused on mood and presence.", src:"/showcase/meridian-museum.png" },
 ];
 
 const packages = [
   { slug:"starter", name:"Starter", price:900, displayPrice:"$900", days:4, rushDays:2, rushFee:200,
-    blurb:"2–3 pages, modern motion, responsive. Fast launch.",
+    blurb:"2–3 pages, responsive, modern motion. Launch quickly.",
     perfectFor:"Founders, creators, boutique services",
     features:["2–3 custom pages","Responsive + performance pass","Simple lead/contact form","Launch in days"],
     cta:"Start Starter"
   },
   { slug:"growth", name:"Growth", price:2300, displayPrice:"$2,300", days:8, rushDays:6, rushFee:400, highlight:true,
-    blurb:"5–7 pages, SEO + schema, booking, Maps, integrations.",
+    blurb:"5–7 pages, SEO + schema, booking & Maps, integrations.",
     perfectFor:"Clinics, gyms, restaurants, SMBs",
     features:["5–7 custom pages","On-page SEO + schema","Booking & Maps","3rd-party integrations","Content guidance"],
     cta:"Grow with Growth"
   },
   { slug:"scale", name:"Scale", price:7000, displayPrice:"$7,000", days:14, rushDays:10, rushFee:800,
-    blurb:"10+ pages, strategy, advanced SEO + analytics, CRM/e-com.",
+    blurb:"10+ pages, strategy, advanced SEO/analytics, CRM/e-com.",
     perfectFor:"Law, real estate, healthcare, e-com",
     features:["10+ pages","Strategy + funnel mapping","Advanced SEO + analytics","Booking / e-com / CRM","Copy support"],
     cta:"Scale with Scale"
@@ -93,7 +89,7 @@ function Topbar(){
   const go = (id)=> (e)=>{ e.preventDefault(); sessionStorage.setItem("scrollTo", id); navigate("/"); setOpen(false); };
   return (
     <>
-      <div className="topbar px-4 lg:px-6 py-3 flex items-center justify-between">
+      <div className="topbar px-4 lg:px-6 py-2.5 flex items-center justify-between">
         <a href="#/" className="ts-h5 font-semibold">CITEKS</a>
         <div className="hidden md:flex items-center gap-6 ts-h6">
           <a href="#/" className="hover:opacity-80">Home</a>
@@ -131,44 +127,39 @@ function Home(){
   return (
     <>
       <Hero />
-      <ProofBand />
+      <Outcomes />
       <ServiceLadder />
       <ShowcaseRow />
-      <PinnedWhy />
+      <ProofBand />
       <ContactBlock />
     </>
   );
 }
 
-/* ---- Hero (soft parallax, editorial headline) ---- */
+/* ---- Hero: stronger scrim + frosted copy panel (white text) ---- */
 function Hero(){
   const ref = useRef(null);
   const prefersRM = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start","end start"] });
-  const yImg   = useTransform(scrollYProgress, [0,1], [0, prefersRM ? 0 : -100]);
-  const yText  = useTransform(scrollYProgress, [0,1], [0, prefersRM ? 0 : -36]);
-  const fade   = useTransform(scrollYProgress, [0,1], [1, prefersRM ? 1 : 0.8]);
+  const yImg   = useTransform(scrollYProgress, [0,1], [0, prefersRM ? 0 : -80]);
+  const fade   = useTransform(scrollYProgress, [0,1], [1, prefersRM ? 1 : 0.88]);
 
   return (
     <section ref={ref} className="hero">
-      <motion.div className="hero-media" style={{
-        backgroundImage: "url('/hero/waterfall.jpg')",
-        y: yImg, opacity: fade
-      }}/>
+      <motion.div className="hero-media" style={{ backgroundImage: "url('/hero/waterfall.jpg')", y: yImg, opacity: fade }}/>
       <div className="hero-scrim"></div>
-      <div className="hero-vignette"></div>
 
       <div className="container h-full grid content-center">
-        <motion.div style={{ y: yText }}>
+        <div className="hero-copy p-5 md:p-6 max-w-2xl">
           <h1 className="ts-h1 font-semibold">
-            Websites engineered to convert —
-            <span style={{color:"var(--accent)"}}>quietly.</span>
+            Websites that grow pipeline —
+            <span style={{color:"#b6ffe5"}}>without the noise.</span>
           </h1>
-          <p className="ts-h5 text-slate-700 mt-3 max-w-2xl">
-            Editorial structure. Purposeful motion. Search-ready. One goal per page, delivered fast.
+          <p className="ts-h6 mt-2 text-white/90">
+            We build quiet, conversion-led sites: fewer choices, faster decisions, clearer value. From structure to search, every detail supports one goal.
           </p>
-          <div className="flex items-center gap-4 mt-6">
-            <a href="#/projects" className="ts-h6 inline-flex items-center gap-2 hover:opacity-90">
+          <div className="flex items-center gap-4 mt-4">
+            <a href="#/projects" className="ts-h6 inline-flex items-center gap-2 underline underline-offset-4 decoration-white/60 hover:opacity-90">
               View projects <ArrowRight className="w-4 h-4"/>
             </a>
             <a
@@ -179,72 +170,67 @@ function Hero(){
               See packages
             </a>
           </div>
-          <div className="ts-h6 text-slate-600 mt-4 flex flex-wrap items-center gap-4">
+          <div className="ts-h6 mt-3 text-white/80 flex flex-wrap items-center gap-4">
             <span className="flex items-center gap-2"><Globe2 className="w-4 h-4"/> English-first</span>
             <span className="flex items-center gap-2"><Building2 className="w-4 h-4"/> Oslo · New York · Amsterdam</span>
             <span className="flex items-center gap-2"><Compass className="w-4 h-4"/> Conversion-led</span>
           </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-/* ---- Proof Band (logos/metrics scaffold) ---- */
-function ProofBand(){
-  return (
-    <section className="container px-6 py-10 lg:py-14">
-      <div className="surface p-5">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Metric label="Projects delivered" value={200}/>
-          <Metric label="Avg. form uplift" value={34} suffix="%" />
-          <Metric label="Average build time" value={8} suffix=" days" />
         </div>
       </div>
     </section>
   );
 }
 
-function Metric({ value, label, suffix="" }){
-  const prefersRM = useReducedMotion();
-  const [n,setN] = useState(0);
-  useEffect(()=>{
-    if (prefersRM) { setN(value); return; }
-    let f = 0, id = setInterval(()=>{ f+=1; const t = Math.min(value, Math.round((f/30)*value)); setN(t); if (t>=value) clearInterval(id); }, 16);
-    return ()=> clearInterval(id);
-  },[value, prefersRM]);
+/* ---- Outcomes (value / “better version after working with us”) ---- */
+function Outcomes(){
+  const items = [
+    ["Clear message → More action", "Pages center on a single decision. Labels over slogans. Lead forms feel effortless."],
+    ["Trust early → Risk down", "Proof, guarantees, transparent pricing appear high on the page to reduce hesitation."],
+    ["Search-ready → Compounding traffic", "IA + schema + fast performance. Content frameworks that scale without mess."],
+    ["Owner-friendly → Faster iteration", "Simple stack, clean CMS hooks, and patterns you can extend without calling a dev."],
+  ];
   return (
-    <div className="surface p-4">
-      <div className="ts-h2 font-semibold" style={{color:"var(--accent)"}}>{n}{suffix}</div>
-      <div className="ts-h6 text-slate-700">{label}</div>
-    </div>
+    <section className="container px-6 py-12 lg:py-16">
+      <h2 className="ts-h2 font-semibold mb-3">After a CITEKS partnership</h2>
+      <p className="ts-h6 text-slate-700 mb-5 max-w-3xl">
+        Your site stops performing like a brochure and starts acting like a quiet sales engine. Fewer steps. Faster load. Clearer copy. Better decisions.
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {items.map(([t,d])=>(
+          <div key={t} className="surface p-5">
+            <div className="ts-h5 font-semibold">{t}</div>
+            <div className="ts-h6 text-slate-700 mt-1">{d}</div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
-/* ---- Service Ladder (packages) ---- */
+/* ---- Packages (smaller type, thinner look) ---- */
 function ServiceLadder(){
   return (
-    <section id="packages" className="container px-6 py-10 lg:py-16">
-      <h2 className="ts-h2 font-semibold mb-6">Packages</h2>
+    <section id="packages" className="container px-6 py-12 lg:py-16">
+      <h2 className="ts-h2 font-semibold mb-5">Packages</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {packages.map(p=>(
           <motion.div key={p.slug} initial={{opacity:0, y:12}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:.45}}
-            className={cx("surface p-6 flex flex-col", p.highlight && "ring-1 ring-[var(--accent)]")}
+            className={cx("surface p-5 flex flex-col", p.highlight && "ring-1 ring-[var(--accent)]")}
           >
             <div className="flex items-baseline justify-between">
-              <div className="ts-h4 font-semibold">{p.name}</div>
+              <div className="ts-h5 font-semibold">{p.name}</div>
               <div className="ts-h3 font-semibold" style={{color:"var(--accent)"}}>{p.displayPrice}</div>
             </div>
             <div className="ts-h6 text-slate-700 mt-1">{p.blurb}</div>
             <div className="ts-h6 text-slate-600 mt-1">Perfect for: {p.perfectFor}</div>
-            <ul className="mt-3 space-y-2">
+            <ul className="mt-2 space-y-2">
               {p.features.map(f=>(
                 <li key={f} className="flex items-start gap-2 ts-h6">
                   <Check className="w-5 h-5" style={{color:"var(--accent)"}}/><span>{f}</span>
                 </li>
               ))}
             </ul>
-            <div className="ts-h6 text-slate-600 mt-3">Typical timeline: {p.days} days (rush {p.rushDays} days +${p.rushFee})</div>
+            <div className="ts-h6 text-slate-600 mt-2">Typical timeline: {p.days} days (rush {p.rushDays} days +${p.rushFee})</div>
             <a href={`#/brief/${p.slug}`} className="btn btn-acc mt-4 self-start">{p.cta} <ArrowRight className="w-4 h-4"/></a>
           </motion.div>
         ))}
@@ -253,11 +239,11 @@ function ServiceLadder(){
   );
 }
 
-/* ---- Horizontal showcase (side-snap) ---- */
+/* ---- Horizontal showcase (lighter, airy) ---- */
 function ShowcaseRow(){
   const prefersRM = useReducedMotion();
   return (
-    <section className="container px-6 py-10 lg:py-16">
+    <section className="container px-6 py-12 lg:py-16">
       <div className="flex items-center justify-between mb-4">
         <h2 className="ts-h2 font-semibold">Selected work</h2>
         <a href="#/projects" className="ts-h6 hover:opacity-80">All projects</a>
@@ -267,7 +253,7 @@ function ShowcaseRow(){
           <motion.figure
             key={s.key}
             className="surface overflow-hidden"
-            whileInView={prefersRM ? {} : { scale: 1.02 }}
+            whileInView={prefersRM ? {} : { scale: 1.015 }}
             transition={{ type: "spring", stiffness: 120, damping: 18 }}
             viewport={{ once: true, amount: 0.6 }}
           >
@@ -285,38 +271,31 @@ function ShowcaseRow(){
   );
 }
 
-/* ---- Pinned “Why” chapters ---- */
-function PinnedWhy(){
-  const steps = [
-    ["Clarity beats clever", "One goal per page. Labels over slogans. Decisions become easy."],
-    ["Trust, fast", "Proof and transparent pricing high on the page reduce perceived risk."],
-    ["Motion with intent", "Micro-feedback that guides—not distracts. Purpose > spectacle."],
-    ["Friction down", "Fast loads, short forms, accessible contrast. The easiest path wins."]
-  ];
+/* ---- Simple proof band (thin, understated) ---- */
+function ProofBand(){
   return (
-    <section className="pin-wrap">
-      <div className="pin-stage">
-        <div className="container px-6 w-full max-w-[900px]">
-          {steps.map((s,i)=> <PinnedLine key={i} title={s[0]} body={s[1]} index={i} total={steps.length} />)}
-        </div>
+    <section className="container px-6 pb-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Metric label="Avg. form uplift" value={34} suffix="%" />
+        <Metric label="Projects delivered" value={200}/>
+        <Metric label="Average build time" value={8} suffix=" days" />
       </div>
     </section>
   );
 }
 
-function PinnedLine({ title, body, index, total }){
-  const ref = useRef(null);
+function Metric({ value, label, suffix="" }){
   const prefersRM = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end","end start"] });
-  const y = useTransform(scrollYProgress, [0,1], [20, 0]);
-  const op = useTransform(scrollYProgress, [0,1], [0.2, 1]);
+  const [n,setN] = useState(0);
+  useEffect(()=>{
+    if (prefersRM) { setN(value); return; }
+    let f = 0, id = setInterval(()=>{ f+=1; const t = Math.min(value, Math.round((f/28)*value)); setN(t); if (t>=value) clearInterval(id); }, 16);
+    return ()=> clearInterval(id);
+  },[value, prefersRM]);
   return (
-    <div ref={ref} className="surface p-6 mb-4">
-      <motion.div style={{ y: prefersRM ? 0 : y, opacity: prefersRM ? 1 : op }}>
-        <div className="ts-h4 font-semibold">{title}</div>
-        <div className="ts-h6 text-slate-700">{body}</div>
-      </motion.div>
-      <div className="hair mt-4 pt-3 ts-h6 text-slate-500">{String(index+1).padStart(2,"0")} / {String(total).padStart(2,"0")}</div>
+    <div className="surface p-4">
+      <div className="ts-h3 font-semibold" style={{color:"var(--accent)"}}>{n}{suffix}</div>
+      <div className="ts-h6 text-slate-700">{label}</div>
     </div>
   );
 }
@@ -324,12 +303,12 @@ function PinnedLine({ title, body, index, total }){
 /* ---- Contact ---- */
 function ContactBlock(){
   return (
-    <section id="contact" className="container px-6 py-10 lg:py-16">
+    <section id="contact" className="container px-6 py-12 lg:py-16">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-5 surface p-6">
+        <div className="lg:col-span-5 surface p-5">
           <h2 className="ts-h2 font-semibold">Let’s build ROI</h2>
           <p className="ts-h6 text-slate-700 mt-2">Tell us about your goals. We’ll reply quickly.</p>
-          <div className="ts-h6 text-slate-700 mt-4">Oslo · New York · Amsterdam</div>
+          <div className="ts-h6 text-slate-700 mt-3">Oslo · New York · Amsterdam</div>
           <a href="mailto:contact@citeks.net" className="ts-h6 underline" style={{color:"var(--accent)"}}>contact@citeks.net</a>
         </div>
         <div className="lg:col-span-7"><ContactForm/></div>
@@ -348,7 +327,7 @@ function ContactForm(){
   }
   return (
     <form name="contact" data-netlify="true" netlify-honeypot="bot-field" onSubmit={submit}
-      className="surface p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+      className="surface p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
       <input type="hidden" name="form-name" value="contact"/><input type="hidden" name="bot-field"/>
       <Field label="Title">
         <select value={form.title} onChange={e=>setForm({...form, title:e.target.value})} className="w-full bg-transparent border border-[var(--hair)] rounded-lg p-3">
@@ -393,19 +372,19 @@ function Area({label, val, set, rows=4}){ return (
 /* ================= PROJECTS ================= */
 function Projects(){
   return (
-    <section className="container px-6 py-10 lg:py-16">
+    <section className="container px-6 py-12 lg:py-16">
       <h1 className="ts-h1 font-semibold mb-4">Projects</h1>
-      <div className="space-y-8">
+      <div className="space-y-6">
         {showcase.map((s,i)=>(
           <article key={s.key} className="surface overflow-hidden">
-            <div className="px-6 pt-6 flex items-center justify-between">
-              <div className="ts-h5 font-semibold">{s.title}</div>
+            <div className="px-5 pt-5 flex items-center justify-between">
+              <div className="ts-h6 font-semibold">{s.title}</div>
               <div className="ts-h6 text-slate-500">#{String(i+1).padStart(2,"0")}</div>
             </div>
-            <div className="mt-4" style={{aspectRatio:"2/1"}}>
+            <div className="mt-3" style={{aspectRatio:"2/1"}}>
               <img src={s.src} alt={s.title} className="w-full h-full object-contain bg-white"/>
             </div>
-            <p className="ts-h6 text-slate-700 p-6">{s.blurb}</p>
+            <p className="ts-h6 text-slate-700 p-5">{s.blurb}</p>
           </article>
         ))}
       </div>
@@ -416,18 +395,18 @@ function Projects(){
 /* ================= WHY US ================= */
 function WhyUs(){
   const bullets = [
-    ["Editorial bones", "Swiss grid with generous breathing room; clear proximity and alignment."],
-    ["Conversion core", "Single goal per page; form flow and messaging designed for action."],
-    ["Search honest", "SEO baked into structure, not bolted on. Schema, IA, and speed."],
-    ["Run-light", "Fast stack, simple deploys, and ownership of content."],
+    ["Editorial bones", "Swiss grid with breathing room; proximity and alignment remove cognitive load."],
+    ["Conversion core", "Single goal per page; optimized forms and clear pathways to action."],
+    ["Search honest", "SEO embedded in IA, schema and performance—not bolted on later."],
+    ["Run-light", "Fast stack, clean handover, and patterns you can extend without heavy dev cycles."],
   ];
   return (
-    <section className="container px-6 py-10 lg:py-16">
+    <section className="container px-6 py-12 lg:py-16">
       <h1 className="ts-h1 font-semibold mb-4">Why choose CITEKS</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {bullets.map(([t,d])=>(
-          <div key={t} className="surface p-6">
-            <div className="ts-h4 font-semibold">{t}</div>
+          <div key={t} className="surface p-5">
+            <div className="ts-h5 font-semibold">{t}</div>
             <div className="ts-h6 text-slate-700">{d}</div>
           </div>
         ))}
@@ -454,11 +433,11 @@ function Brief({ slug }){
     try{ await fetch("/",{method:"POST", body:fd}); navigate(`/pay/${pkg.slug}?rush=${rush?"1":"0"}`);}catch{ alert("Submission failed. Please email contact@citeks.net");}
   }
   return (
-    <section className="container px-6 py-10 lg:py-16">
+    <section className="container px-6 py-12 lg:py-16">
       <h1 className="ts-h2 font-semibold">{pkg.name} brief</h1>
       <p className="ts-h6 text-slate-700 mt-1">{pkg.displayPrice} · Typical timeline: {pkg.days} days (rush {pkg.rushDays} days +${pkg.rushFee})</p>
       <form name={`brief-${pkg.slug}`} data-netlify="true" netlify-honeypot="bot-field" encType="multipart/form-data" onSubmit={submit}
-        className="surface p-6 grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        className="surface p-5 grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
         <input type="hidden" name="form-name" value={`brief-${pkg.slug}`}/><input type="hidden" name="bot-field"/>
         <Input label="Company / brand" val={form.company} set={v=>setForm({...form,company:v})} err={err.company}/>
         <Input label="Contact name" val={form.contact} set={v=>setForm({...form,contact:v})} err={err.contact}/>
@@ -521,19 +500,19 @@ function Pay({ slug }){
   const total = pkg.price + (rush ? pkg.rushFee : 0);
 
   return (
-    <section className="container px-6 py-10 lg:py-16">
+    <section className="container px-6 py-12 lg:py-16">
       <h1 className="ts-h2 font-semibold">Payment</h1>
-      <div className="surface p-6 mt-6">
-        <div className="ts-h4 font-semibold">{pkg.name}</div>
+      <div className="surface p-5 mt-5">
+        <div className="ts-h5 font-semibold">{pkg.name}</div>
         <div className="ts-h6 text-slate-700 mt-1">Base price {pkg.displayPrice}. Typical timeline {pkg.days} days.</div>
 
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center justify-between mt-3">
           <label className="ts-h6 flex items-center gap-2"><input type="checkbox" checked={rush} onChange={e=>setRush(e.target.checked)}/> Rush delivery: finish in {pkg.rushDays} days (+${pkg.rushFee})</label>
           <div className="ts-h4 font-semibold" style={{color:"var(--accent)"}}>Total: ${total}</div>
         </div>
 
-        <div className="mt-6">{error && <div className="ts-h6 text-red-600 mb-3 whitespace-pre-wrap">{error}</div>}<div ref={containerRef} id="checkout" className="w-full"/></div>
-        <div className="mt-4 ts-h6 text-slate-600">Secure payment powered by Stripe.</div>
+        <div className="mt-5">{error && <div className="ts-h6 text-red-600 mb-3 whitespace-pre-wrap">{error}</div>}<div ref={containerRef} id="checkout" className="w-full"/></div>
+        <div className="mt-3 ts-h6 text-slate-600">Secure payment powered by Stripe.</div>
       </div>
     </section>
   );
@@ -553,7 +532,7 @@ function ThankYou(){
       <h1 className="ts-h2 font-semibold mb-2">Thank you!</h1>
       <p className="ts-h6 text-slate-700">We’ll email you shortly from <b>contact@citeks.net</b> with next steps.</p>
       {summary && (
-        <div className="surface p-6 mt-6">
+        <div className="surface p-5 mt-5">
           <div className="ts-h5 font-semibold">Purchase summary</div>
           <div className="ts-h6 text-slate-800 mt-2 space-y-1">
             <div><b>Status:</b> {summary.payment_status}</div>
@@ -574,7 +553,7 @@ function ThankYou(){
 /* ================= FOOTER / STATIC ================= */
 function Footer(){
   return (
-    <footer className="hair mt-12">
+    <footer className="hair mt-10">
       <div className="container px-6 py-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div className="ts-h6 text-slate-600">© {new Date().getFullYear()} CITEKS — Oslo · New York · Amsterdam</div>
         <div className="ts-h6"><a href="#/privacy" className="hover:opacity-80 mr-4">Privacy</a><a href="#/tech-terms" className="hover:opacity-80">Technical terms</a></div>
@@ -587,7 +566,7 @@ function PrivacyPolicy(){
   return (
     <section className="container px-6 py-16">
       <h1 className="ts-h1 font-semibold mb-4">Privacy Policy</h1>
-      <div className="surface p-6 ts-h6 text-slate-800 space-y-3">
+      <div className="surface p-5 ts-h6 text-slate-800 space-y-3">
         <p><b>Who we are.</b> CITEKS builds fast, modern websites that convert. Contact: contact@citeks.net.</p>
         <p><b>What we collect.</b> Form/brief submissions (including uploads). No cookies.</p>
         <p><b>Use of data.</b> Replies, proposals, service delivery, payments (Stripe), compliance.</p>
@@ -616,7 +595,7 @@ function TechTerms(){
   return (
     <section className="container px-6 py-16">
       <h1 className="ts-h1 font-semibold mb-4">Technical terms</h1>
-      <div className="surface p-6">
+      <div className="surface p-5">
         <ul className="ts-h6 text-slate-800 space-y-2">{rows.map(([t,d])=> <li key={t}><b>{t}:</b> {d}</li>)}</ul>
       </div>
       <a href="#/" className="btn btn-acc mt-6">Back to home</a>
