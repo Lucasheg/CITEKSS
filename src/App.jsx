@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from "framer-motion";
-import { ArrowRight, Mail, Menu, X, Check, Globe2, Building2, Compass } from "lucide-react";
+import { ArrowRight, Mail, Menu, X, Check, Building2, Compass } from "lucide-react";
 
 /**
  * CITEKS — Refined skeleton (smaller type, thin lines, stronger value messaging)
@@ -20,24 +20,9 @@ const showcase = [
 ];
 
 const packages = [
-  { slug:"starter", name:"Starter", price:900, displayPrice:"$900", days:4, rushDays:2, rushFee:200,
-    blurb:"2–3 pages, responsive, modern motion. Launch quickly.",
-    perfectFor:"Founders, creators, boutique services",
-    features:["2–3 custom pages","Responsive + performance pass","Simple lead/contact form","Launch in days"],
-    cta:"Start Starter"
-  },
-  { slug:"growth", name:"Growth", price:2300, displayPrice:"$2,300", days:8, rushDays:6, rushFee:400, highlight:true,
-    blurb:"5–7 pages, SEO + schema, booking & Maps, integrations.",
-    perfectFor:"Clinics, gyms, restaurants, SMBs",
-    features:["5–7 custom pages","On-page SEO + schema","Booking & Maps","3rd-party integrations","Content guidance"],
-    cta:"Grow with Growth"
-  },
-  { slug:"scale", name:"Scale", price:7000, displayPrice:"$7,000", days:14, rushDays:10, rushFee:800,
-    blurb:"10+ pages, strategy, advanced SEO/analytics, CRM/e-com.",
-    perfectFor:"Law, real estate, healthcare, e-com",
-    features:["10+ pages","Strategy + funnel mapping","Advanced SEO + analytics","Booking / e-com / CRM","Copy support"],
-    cta:"Scale with Scale"
-  },
+  { slug:"starter", name:"Starter", price:900, displayPrice:"$900", days:4, rushDays:2, rushFee:200, blurb:"2–3 pages, responsive, modern motion. Launch quickly.", perfectFor:"Founders, creators, boutique services", features:["2–3 custom pages","Responsive + performance pass","Simple lead/contact form","Launch in days"], cta:"Start Starter" },
+  { slug:"growth", name:"Growth", price:2300, displayPrice:"$2,300", days:8, rushDays:6, rushFee:400, highlight:true, blurb:"5–7 pages, SEO + schema, booking & Maps, integrations.", perfectFor:"Clinics, gyms, restaurants, SMBs", features:["5–7 custom pages","On-page SEO + schema","Booking & Maps","3rd-party integrations","Content guidance"], cta:"Grow with Growth" },
+  { slug:"scale", name:"Scale", price:7000, displayPrice:"$7,000", days:14, rushDays:10, rushFee:800, blurb:"10+ pages, strategy, advanced SEO/analytics, CRM/e-com.", perfectFor:"Law, real estate, healthcare, e-com", features:["10+ pages","Strategy + funnel mapping","Advanced SEO + analytics","Booking / e-com / CRM","Copy support"], cta:"Scale with Scale" },
 ];
 
 /* ---------- Router ---------- */
@@ -128,6 +113,7 @@ function Home(){
     <>
       <Hero />
       <Outcomes />
+      <Expertise />   {/* NEW section */}
       <ServiceLadder />
       <ShowcaseRow />
       <ProofBand />
@@ -171,9 +157,8 @@ function Hero(){
             </a>
           </div>
           <div className="ts-h6 mt-3 text-white/80 flex flex-wrap items-center gap-4">
-            <span className="flex items-center gap-2"><Globe2 className="w-4 h-4"/> English-first</span>
             <span className="flex items-center gap-2"><Building2 className="w-4 h-4"/> Oslo · New York · Amsterdam</span>
-            <span className="flex items-center gap-2"><Compass className="w-4 h-4"/> Conversion-led</span>
+            <span className="flex items-center gap-2"><Compass className="w-4 h-4"/> Conversion-led • Design & SEO expertise</span>
           </div>
         </div>
       </div>
@@ -201,6 +186,43 @@ function Outcomes(){
             <div className="ts-h5 font-semibold">{t}</div>
             <div className="ts-h6 text-slate-700 mt-1">{d}</div>
           </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ---- NEW: Expertise (explicit Web Design & SEO chops) ---- */
+function Expertise(){
+  const cards = [
+    {
+      title: "Web design craft",
+      desc: "Editorial layouts, Swiss grid, typographic hierarchy, and restrained motion that supports decisions—not distracts. We remove cognitive load so intent moves forward.",
+      points: ["Information architecture that reads fast", "Micro-interactions for feedback, not fireworks", "Accessibility & contrast baked in"],
+    },
+    {
+      title: "SEO & content architecture",
+      desc: "Search is designed into the site: keyword-mapped IA, schema, internal linking, and performance budgets. We set foundations that compound organically.",
+      points: ["Keyword map per page + intent", "Schema (Org, LocalBusiness, Service, FAQ…)", "Fast LCP, stable CLS, responsive INP"],
+    },
+  ];
+  return (
+    <section className="container px-6 py-12 lg:py-16">
+      <h2 className="ts-h2 font-semibold mb-3">Expertise</h2>
+      <p className="ts-h6 text-slate-700 mb-5 max-w-3xl">
+        We combine design discipline with search engineering so your site feels premium and performs like a growth channel.
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {cards.map((c)=>(
+          <article key={c.title} className="surface p-5">
+            <div className="ts-h5 font-semibold">{c.title}</div>
+            <p className="ts-h6 text-slate-700 mt-1">{c.desc}</p>
+            <ul className="mt-2 space-y-1">
+              {c.points.map(p=>(
+                <li key={p} className="ts-h6 text-slate-700 flex items-start gap-2"><Check className="w-5 h-5" style={{color:"var(--accent)"}}/>{p}</li>
+              ))}
+            </ul>
+          </article>
         ))}
       </div>
     </section>
